@@ -1,0 +1,355 @@
+from pathlib import Path
+
+html = """<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Atividade – Simulação de Agência de Social Media</title>
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#111933;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --blue:#2563eb;
+      --cyan:#06b6d4;
+      --purple:#7c3aed;
+      --orange:#f97316;
+      --green:#16a34a;
+      --line:#dbe4f0;
+      --soft:#eef4ff;
+      --shadow:0 18px 50px rgba(0,0,0,.18);
+      --radius:24px;
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;padding:0;
+      font-family:Inter,Segoe UI,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(37,99,235,.22), transparent 32%),
+        radial-gradient(circle at 80% 20%, rgba(124,58,237,.18), transparent 28%),
+        linear-gradient(135deg,var(--bg1),var(--bg2));
+      min-height:100%;
+    }
+    .wrap{width:min(1180px,92vw);margin:0 auto;padding:32px 0 60px}
+    .hero{
+      position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.08);
+      border-radius:32px;padding:36px 34px;
+      background:linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      box-shadow:0 20px 60px rgba(0,0,0,.25);color:#fff;
+    }
+    .badge{
+      display:inline-block;padding:10px 16px;border-radius:999px;
+      background:linear-gradient(90deg,var(--blue),var(--cyan));
+      font-weight:700;letter-spacing:.4px;font-size:.92rem;margin-bottom:18px;
+    }
+    h1{margin:0 0 10px;font-size:clamp(2rem,4vw,3.3rem);line-height:1.05;letter-spacing:-1px}
+    .hero p{max-width:850px;margin:0;color:rgba(255,255,255,.9);font-size:1.08rem;line-height:1.6}
+    .hero-grid{margin-top:24px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .hero-chip{
+      background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);
+      border-radius:18px;padding:16px 18px;backdrop-filter:blur(6px);
+    }
+    .hero-chip strong{display:block;font-size:1rem;margin-bottom:6px;color:#fff}
+    .hero-chip span{color:rgba(255,255,255,.82);font-size:.96rem;line-height:1.45}
+    .section{
+      margin-top:28px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+      padding:28px;border:1px solid rgba(15,23,42,.06);
+    }
+    .section-title{display:flex;align-items:center;gap:12px;margin:0 0 18px;font-size:1.55rem;letter-spacing:-.4px}
+    .dot{width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--cyan));flex:0 0 14px}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+    .card{
+      border:1px solid var(--line);background:linear-gradient(180deg,#fff,#fbfdff);
+      border-radius:22px;padding:20px 20px 18px;box-shadow:0 8px 24px rgba(15,23,42,.06);height:100%;
+    }
+    .card h3{margin:0 0 10px;font-size:1.15rem;letter-spacing:-.2px}
+    .card p{margin:0;color:var(--muted);line-height:1.6}
+    .case{position:relative;overflow:hidden}
+    .case::before{
+      content:"";position:absolute;inset:0 auto 0 0;width:8px;
+      background:linear-gradient(180deg,var(--blue),var(--cyan));border-radius:22px 0 0 22px;
+    }
+    .case.green::before{background:linear-gradient(180deg,var(--green),#22c55e)}
+    .case.orange::before{background:linear-gradient(180deg,var(--orange),#fb923c)}
+    .case.purple::before{background:linear-gradient(180deg,var(--purple),#8b5cf6)}
+    .case .inner{padding-left:12px}
+    ul,ol{margin:12px 0 0 1.1rem;padding:0;line-height:1.7}
+    li{margin-bottom:6px}
+    .highlight{
+      margin-top:14px;background:var(--soft);border:1px solid #cfe0ff;border-radius:18px;
+      padding:14px 16px;color:#1e3a8a;font-weight:600;line-height:1.5;
+    }
+    .flow{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:16px}
+    .step{
+      position:relative;background:#fff;border:1px solid var(--line);border-radius:20px;
+      padding:16px 14px;text-align:center;box-shadow:0 6px 20px rgba(15,23,42,.06);
+    }
+    .step .n{
+      width:34px;height:34px;border-radius:50%;display:grid;place-items:center;margin:0 auto 10px;
+      color:#fff;font-weight:800;background:linear-gradient(135deg,var(--blue),var(--purple));
+    }
+    .step b{display:block;margin-bottom:6px;font-size:1rem}
+    .step span{color:var(--muted);font-size:.93rem;line-height:1.45}
+    .rules{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;align-items:start}
+    .pill-list{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+    .pill{
+      padding:10px 14px;border-radius:999px;background:#f8fafc;border:1px solid var(--line);
+      font-weight:700;color:#1e293b;font-size:.95rem;
+    }
+    .deliverable{
+      background:linear-gradient(180deg,#0f172a,#111827);color:#fff;border-radius:22px;
+      padding:22px;box-shadow:0 16px 40px rgba(0,0,0,.24);
+    }
+    .deliverable h3{margin-top:0;margin-bottom:10px;font-size:1.2rem}
+    .deliverable li{color:rgba(255,255,255,.92)}
+    .footer-note{
+      margin-top:18px;background:linear-gradient(90deg,rgba(37,99,235,.08),rgba(124,58,237,.08));
+      border:1px solid rgba(37,99,235,.15);border-radius:18px;padding:16px 18px;line-height:1.6;
+      color:#1f2f5c;font-weight:600;
+    }
+    .cta{margin-top:28px;display:flex;gap:14px;flex-wrap:wrap}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;padding:14px 18px;border-radius:14px;
+      text-decoration:none;font-weight:800;border:none;cursor:pointer;transition:.2s ease;font-size:.98rem;
+    }
+    .btn.primary{background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;box-shadow:0 12px 25px rgba(37,99,235,.28)}
+    .btn.secondary{background:#fff;color:var(--text);border:1px solid var(--line)}
+    .btn:hover{transform:translateY(-1px)}
+    .small{font-size:.95rem;color:var(--muted)}
+    .score{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:16px}
+    .score .box{
+      border-radius:18px;padding:18px;background:#fff;border:1px solid var(--line);
+      box-shadow:0 6px 18px rgba(15,23,42,.06);
+    }
+    .score .box strong{display:block;font-size:1rem;margin-bottom:8px}
+    @media (max-width: 960px){
+      .hero-grid,.grid-3,.grid-2,.flow,.rules,.score{grid-template-columns:1fr}
+      .wrap{width:min(94vw,1180px)}
+      .section{padding:22px}
+    }
+    @media print{
+      body{background:#fff}
+      .hero{background:#fff;color:#000;border:1px solid #ddd;box-shadow:none}
+      .hero p,.hero-chip span{color:#333}
+      .hero-chip{background:#fff;color:#000}
+      .section,.deliverable,.card,.step,.score .box{box-shadow:none}
+      .cta{display:none}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="badge">ATIVIDADE • SIMULAÇÃO DE AGÊNCIA DE SOCIAL MEDIA</div>
+      <h1>Agora é com vocês.</h1>
+      <p>
+        Nesta atividade, vocês vão assumir o papel de uma equipe de Social Media e construir
+        uma proposta profissional de atuação. A ideia não é “inventar post”, mas pensar como
+        gente de mercado: definir objetivo, organizar fluxo de trabalho, usar linguagem
+        profissional e apresentar uma estratégia clara.
+      </p>
+
+      <div class="hero-grid">
+        <div class="hero-chip">
+          <strong>Formato</strong>
+          <span>Trabalho em grupo com apresentação curta no final.</span>
+        </div>
+        <div class="hero-chip">
+          <strong>Tempo</strong>
+          <span>30 a 40 minutos para construir a proposta.</span>
+        </div>
+        <div class="hero-chip">
+          <strong>Missão</strong>
+          <span>Falar e pensar como profissionais de Social Media.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title"><span class="dot"></span> Escolha do caso</h2>
+      <div class="grid-3">
+        <div class="card case orange">
+          <div class="inner">
+            <h3>🟤 Caso 1 — Negócio local</h3>
+            <p>Exemplos: cafeteria, hamburgueria, estética, loja de bairro.</p>
+          </div>
+        </div>
+        <div class="card case green">
+          <div class="inner">
+            <h3>🟢 Caso 2 — ONG / causa social</h3>
+            <p>Exemplos: doação, impacto social, conscientização, mobilização.</p>
+          </div>
+        </div>
+        <div class="card case purple">
+          <div class="inner">
+            <h3>🔵 Caso 3 — Criador de conteúdo</h3>
+            <p>Exemplos: educação, opinião, entretenimento, cortes, aulas, podcast.</p>
+          </div>
+        </div>
+      </div>
+      <div class="highlight">
+        Escolham <strong>apenas um caso</strong> por grupo. A partir dele, vocês vão montar uma proposta completa.
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title"><span class="dot"></span> Parte 1 — Objetivo principal</h2>
+      <div class="rules">
+        <div class="card">
+          <h3>Definam um objetivo principal</h3>
+          <p>Escolham apenas <strong>um</strong> objetivo como foco central da estratégia.</p>
+          <div class="pill-list">
+            <span class="pill">Awareness</span>
+            <span class="pill">Engajamento</span>
+            <span class="pill">Construção de comunidade</span>
+            <span class="pill">Tráfego</span>
+            <span class="pill">Conversão</span>
+          </div>
+        </div>
+        <div class="deliverable">
+          <h3>Entreguem isso de forma clara:</h3>
+          <ol>
+            <li>Qual foi o objetivo escolhido?</li>
+            <li>Por que esse objetivo faz sentido para o caso?</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title"><span class="dot"></span> Parte 2 — Plataformas e presença</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Escolham onde atuar</h3>
+          <p>Definam em quais plataformas a estratégia vai existir.</p>
+          <ul>
+            <li>Instagram</li>
+            <li>TikTok</li>
+            <li>YouTube</li>
+            <li>LinkedIn</li>
+            <li>WhatsApp / Telegram</li>
+            <li>Google Business Profile</li>
+            <li>X / Threads / Discord</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Justifiquem a escolha</h3>
+          <p>Não basta dizer “porque todo mundo usa”. Expliquem por que essas plataformas fazem sentido para o caso.</p>
+          <ul>
+            <li>Onde está o público?</li>
+            <li>Que tipo de presença faz sentido?</li>
+            <li>Que tipo de conteúdo será melhor recebido ali?</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title"><span class="dot"></span> Parte 3 — Fluxo de trabalho</h2>
+      <p class="small">Montem o fluxo completo de Social Media, em ordem lógica.</p>
+      <div class="flow">
+        <div class="step"><div class="n">1</div><b>Definição estratégica</b><span>Objetivo, público e plataformas.</span></div>
+        <div class="step"><div class="n">2</div><b>Planejamento</b><span>Pauta, linha editorial e calendário.</span></div>
+        <div class="step"><div class="n">3</div><b>Produção</b><span>Roteiro, copy, design e criativo.</span></div>
+        <div class="step"><div class="n">4</div><b>Publicação</b><span>Canal, formato e frequência.</span></div>
+        <div class="step"><div class="n">5</div><b>Monitoramento</b><span>Feedback do público e sinais.</span></div>
+        <div class="step"><div class="n">6</div><b>Ajuste</b><span>Melhorias no que será feito depois.</span></div>
+      </div>
+      <div class="highlight">
+        Além do fluxo, o grupo precisa responder: <strong>quem faz o quê?</strong>
+      </div>
+      <div class="score">
+        <div class="box"><strong>Estratégia</strong><span class="small">Quem define objetivo, público e direção geral?</span></div>
+        <div class="box"><strong>Copy / Roteiro</strong><span class="small">Quem transforma a ideia em mensagem?</span></div>
+        <div class="box"><strong>Design / Criativo</strong><span class="small">Quem pensa visual, peça e execução?</span></div>
+        <div class="box"><strong>Publicação / Monitoramento</strong><span class="small">Quem publica, acompanha e observa feedback?</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title"><span class="dot"></span> Parte 4 — Linguajar profissional</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Tradução obrigatória</h3>
+          <p>Vocês precisam transformar ideias genéricas em linguagem profissional.</p>
+          <ul>
+            <li><strong>Errado:</strong> “Vamos postar vídeo legal.”</li>
+            <li><strong>Certo:</strong> “Vamos produzir vídeos curtos com foco em awareness, usando hooks fortes e CTA claro.”</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Use pelo menos 5 termos técnicos</h3>
+          <div class="pill-list">
+            <span class="pill">Hook</span>
+            <span class="pill">CTA</span>
+            <span class="pill">Copy</span>
+            <span class="pill">Criativo</span>
+            <span class="pill">Alcance</span>
+            <span class="pill">Engajamento</span>
+            <span class="pill">Conversão</span>
+            <span class="pill">Frequência</span>
+            <span class="pill">Distribuição</span>
+            <span class="pill">Conteúdo orgânico</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer-note">
+        A entrega precisa soar como uma proposta profissional, não como conversa solta de usuário.
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title"><span class="dot"></span> Parte 5 — Estrutura final da entrega</h2>
+      <div class="rules">
+        <div class="card">
+          <h3>Organizem a proposta nessa ordem</h3>
+          <ol>
+            <li>Objetivo principal</li>
+            <li>Público que querem atingir</li>
+            <li>Plataformas escolhidas</li>
+            <li>Tipo de conteúdo</li>
+            <li>Fluxo de trabalho</li>
+            <li>Linguagem profissional aplicada</li>
+          </ol>
+        </div>
+        <div class="deliverable">
+          <h3>Apresentação final</h3>
+          <ol>
+            <li>Tempo do grupo: <strong>2 a 3 minutos</strong></li>
+            <li>Apresentem o que decidiram</li>
+            <li>Expliquem por que decidiram assim</li>
+            <li>Mostrem como fariam na prática</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title"><span class="dot"></span> O que mais conta aqui</h2>
+      <div class="score">
+        <div class="box"><strong>Clareza</strong><span class="small">O objetivo está claro ou está genérico?</span></div>
+        <div class="box"><strong>Coerência</strong><span class="small">A estratégia faz sentido para o caso?</span></div>
+        <div class="box"><strong>Linguagem profissional</strong><span class="small">O grupo fala como profissional ou como usuário?</span></div>
+        <div class="box"><strong>Estrutura</strong><span class="small">Existe fluxo lógico ou é só ideia solta?</span></div>
+      </div>
+      <div class="highlight">
+        Ideia forte para guardar: <strong>quem não sabe o que está fazendo, posta. Quem sabe, estrutura, testa e melhora.</strong>
+      </div>
+    </section>
+
+    <div class="cta">
+      <button class="btn primary" onclick="window.print()">Imprimir / Salvar em PDF</button>
+      <a class="btn secondary" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Voltar ao topo</a>
+    </div>
+  </div>
+</body>
+</html>
+"""
+path = Path("/mnt/data/atividade_simulacao_agencia_social_media.html")
+path.write_text(html, encoding="utf-8")
+print(path)
